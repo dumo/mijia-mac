@@ -1,15 +1,15 @@
 # mijia-mac
 
-用 Swift 写的 macOS 米家（Mi Home）客户端：菜单栏常驻 + 主窗口网格，能看设备、拨开关、执行场景。
+用 Swift 实现的 macOS 米家（Mi Home）非官方客户端：菜单栏常驻 + 主窗口设备卡片，支持查看设备状态、一键开关设备、执行场景等。
 
-它不是官方客户端，也不依赖任何第三方米家 SDK——整个米家 HTTP 协议（登录、RC4 加密、签名、
-设备属性读写、场景执行）都在这份代码里用 Swift 原生实现了一遍。
+非官方客户端，也不依赖任何第三方米家 SDK——整个米家 HTTP 协议（登录、RC4 加密、签名、
+设备属性读写、场景执行）都使用 Swift 原生实现，追求体积小巧且高性能，安装包目前小于 10MB。
 
 ---
 
 ## 当前状态
 
-**自用开发中**，功能可用但不保证稳定。已实测跑通：扫码登录、多家庭 / 多房间、17 台设备的
+**自用开发中**，功能可用但不保证稳定。已实测跑通：扫码登录、多家庭 / 多房间、多设备的
 属性读取、开关控制、场景执行、miot-spec 规格解析。
 
 ## 功能
@@ -29,21 +29,8 @@
 ## 构建
 
 要求 **macOS 26+ / Swift 6.2 / Xcode 27**（项目用了 SwiftUI 的 `.reorderable` 之外的
-macOS 26 控件与 Swift 6 并发）。
+macOS 26 控件与 Swift 6 ）。
 
-```bash
-# 库 + 命令行探针
-swift build
-swift test                      # 94 个测试
-
-# 只读探针（登录后会列出家庭/设备，可扫描开关属性）
-swift run mijia-probe --help
-swift run mijia-probe --switchscan
-
-# macOS App（工程由 project.yml 生成，不入库）
-brew install xcodegen
-cd Apps/MijiaMac && xcodegen && open MijiaMac.xcodeproj
-```
 
 ## 工程结构
 
@@ -66,8 +53,8 @@ GPL-3.0）所公开的米家 HTTP 协议事实的学习。
 **必须说明清楚的是：**
 
 - 本项目**没有复制其任何代码**，也没有把它作为依赖引入；
-- `Tools/gen_golden.py` 是依据公开协议事实手写的**独立复现**，注释里明确写着
-  「不 import mijiaAPI，避免把 GPL-3.0 代码带进本项目」；
+- `Tools/gen_golden.py` 是依据公开协议事实手写的**独立复现**，
+  「未 import mijiaAPI，避免把 GPL-3.0 代码带进本项目」；
 - 所有 Swift 实现都是在本项目内独立完成的。
 
 因此二者是**平行实现**关系，而非 fork 或派生。采用与上游相同的 GPL-3.0 是为免许可争议。
@@ -82,9 +69,6 @@ GPL-3.0）所公开的米家 HTTP 协议事实的学习。
   公开整理与参考实现。本项目仅参考其协议事实（端点、参数、加密步骤），未复制代码。
 - **[miot-spec.org](https://miot-spec.org/)**（小米官方设备规格实例库）—— 用于解析
   `siid` / `piid` 映射，规格结果在本地缓存。
-- **[xcodegen](https://github.com/yonaskolb/XcodeGen)**（MIT）—— Xcode 工程由
-  `Apps/MijiaMac/project.yml` 生成。
-- Apple 系统框架：Foundation、SwiftUI、AppKit、CoreImage、Compression。
 
 > 本项目**不含任何第三方运行时依赖**——`Package.swift` 里没有任何 `dependencies`。
 
@@ -92,18 +76,7 @@ GPL-3.0）所公开的米家 HTTP 协议事实的学习。
 
 ## 隐私
 
-登录凭据、设备列表、场景都是敏感数据，本项目的处理原则：
-
-- 凭据 `auth.json` 只存在**本机** `~/.config/mijia-mac/auth.json`，**不在仓库内**，也从不上传；
-- 应用设置存在 `~/Library/Application Support/mijia-mac/`，规格缓存存在
-  `~/.config/mijia-mac/specs/`，同样不在仓库内；
-- 仓库内**没有任何真实 token / cookie / 设备 ID**：测试夹具与代码注释里的示例全部是合成值
-  （如 `100000001`、`FAKE_CUSERID_VALUE`、base64 的 `bytes(0..32)`）；
-- `.gitignore` 额外兜底排除了 `auth.json`、`settings.json` 等文件名，防止有人把副本
-  拷进项目目录后误提交；
-- `.build/`（编译产物，二进制里会残留编译时的字面量）也在 `.gitignore` 中。
-
-**如果你 fork 或二次开发，请先自查一遍有没有把本机数据带进来。**
+登录凭据、设备列表、场景都在本地处理，本app没有服务器。
 
 ## 免责声明
 
