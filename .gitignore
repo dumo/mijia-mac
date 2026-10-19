@@ -1,5 +1,7 @@
 # ── 构建产物（含编译进二进制的旧数据，绝不能进仓库）──
 .build/
+build/
+dist/
 DerivedData/
 *.o
 *.xctest

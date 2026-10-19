@@ -1,10 +1,9 @@
 import SwiftUI
 import MijiaCore
 
-/// 设置页：外观、开机自启、隐藏场景入口、默认小爱音箱、版本检测。
+/// 设置页：外观、开机自启、隐藏场景入口、默认小爱音箱、关于。
 struct SettingsView: View {
     @Environment(AppState.self) private var state
-    @State private var checking = false
 
     var body: some View {
         @Bindable var settings = state.settings
@@ -188,7 +187,6 @@ struct SettingsView: View {
     // MARK: - 关于 / 版本
 
     private var aboutSection: some View {
-        @Bindable var settings = state.settings
         return Section("关于") {
             HStack {
                 Text("当前版本")
@@ -196,55 +194,11 @@ struct SettingsView: View {
                 Text(state.currentVersion)
                     .foregroundStyle(.secondary)
             }
-            Button {
-                Task { await check() }
-            } label: {
-                if checking {
-                    HStack { ProgressView().controlSize(.small); Text("正在检查…") }
-                } else {
-                    Text("检查更新")
-                }
-            }
-            .disabled(checking)
-
-            if let latest = settings.latestVersion {
-                HStack {
-                    Text("最新版本")
-                    Spacer()
-                    Text(latest).foregroundStyle(.secondary)
-                }
-                if state.hasUpdate {
-                    HStack(spacing: 6) {
-                        Image(systemName: "arrow.up.circle.fill")
-                            .foregroundStyle(Color.mijiaGreen)
-                        Text("发现新版本，可前往 GitHub Releases 下载")
-                            .foregroundStyle(Color.mijiaGreen)
-                        Spacer()
-                    }
-                    .font(.system(size: 11.5))
-                }
-            }
-
-            if let date = settings.lastVersionCheckAt {
-                HStack {
-                    Text("上次检查")
-                    Spacer()
-                    Text(date.formatted(date: .abbreviated, time: .shortened))
-                        .foregroundStyle(.secondary)
-                }
-                .font(.system(size: 11))
-            }
 
             if let url = URL(string: "https://github.com/\(AppState.githubRepo)") {
                 Link("项目仓库", destination: url)
                     .font(.system(size: 12))
             }
         }
-    }
-
-    private func check() async {
-        checking = true
-        await state.checkForUpdate()
-        checking = false
     }
 }

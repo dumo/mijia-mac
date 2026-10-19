@@ -28,8 +28,6 @@ final class AppState {
     var accountId: String?
     var errorMessage: String?
     var statusMessage: String?
-    /// 版本检测失败信息（只在设置页展示，不污染主界面）
-    var updateError: String?
     /// 设备控制失败（比 statusMessage 更醒目的红色提示）
     var actionError: String?
 
@@ -111,7 +109,6 @@ final class AppState {
                 await loadDevices()
                 phase = .ready
                 restartMenuBarClimateUpdates()
-                Task { await checkForUpdate() }
                 return
             } catch {
                 statusMessage = "登录态已失效：\(error.localizedDescription)"
@@ -953,38 +950,13 @@ final class AppState {
         }
     }
 
-    // MARK: - 版本检测
+    // MARK: - 关于
 
-    /// GitHub 仓库（Release 检测用）。若与实际仓库不符，改这里即可。
-    static let githubRepo = "Zhuanz/mijia-mac"
+    /// GitHub 仓库地址（设置页「项目仓库」链接）。若与实际仓库不符，改这里即可。
+    static let githubRepo = "dumo/mijia-mac"
 
     var currentVersion: String {
         Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "0.0.0"
-    }
-
-    /// 是否有新版本可更新（仅做粗略的语义化版本比较，用于提示）
-    var hasUpdate: Bool {
-        guard let latest = settings.latestVersion, !latest.isEmpty else { return false }
-        return VersionChecker.compare(latest, currentVersion) == .orderedDescending
-    }
-
-    func checkForUpdate() async {
-        do {
-            guard let url = URL(string: "https://api.github.com/repos/\(Self.githubRepo)/releases/latest") else {
-                return
-            }
-            var req = URLRequest(url: url)
-            req.timeoutInterval = 15
-            req.setValue("application/vnd.github+json", forHTTPHeaderField: "Accept")
-            let (data, _) = try await URLSession.shared.data(for: req)
-            if let tag = VersionChecker.latestTag(from: data) {
-                settings.recordVersionCheck(tag)
-                updateError = nil
-            }
-        } catch {
-            // 版本检测失败不影响主流程，只在设置页里提示
-            updateError = error.localizedDescription
-        }
     }
 
     /// 菜单栏里显示的设备（自动模式）：沿用稳定顺序取前 maxCount 个。
