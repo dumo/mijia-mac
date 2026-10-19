@@ -1,0 +1,38 @@
+name: MijiaMac
+
+options:
+  bundleIdPrefix: com.mijiamac
+  deploymentTarget:
+    macOS: "26.0"
+  createIntermediateGroups: true
+  groupSortPosition: top
+
+packages:
+  MijiaCore:
+    path: ../..
+
+targets:
+  MijiaMac:
+    type: application
+    platform: macOS
+    sources:
+      - path: Sources
+    dependencies:
+      - package: MijiaCore
+        product: MijiaCore
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.mijiamac
+        MARKETING_VERSION: 0.1.0
+        CURRENT_PROJECT_VERSION: 1
+        GENERATE_INFOPLIST_FILE: YES
+        # 菜单栏常驻：默认不显示 Dock 图标，打开主窗口时再临时切为 regular
+        INFOPLIST_KEY_LSUIElement: YES
+        INFOPLIST_KEY_CFBundleDisplayName: 米家
+        INFOPLIST_KEY_NSHumanReadableCopyright: ""
+        ENABLE_HARDENED_RUNTIME: YES
+        CODE_SIGN_STYLE: Automatic
+        # 全局强调色（= 主题绿），侧边栏选中底色等系统控件都会跟随
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+        SWIFT_VERSION: 6.0
+        SWIFT_STRICT_CONCURRENCY: minimal

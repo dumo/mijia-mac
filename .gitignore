@@ -1,0 +1,38 @@
+# ── 构建产物（含编译进二进制的旧数据，绝不能进仓库）──
+.build/
+DerivedData/
+*.o
+*.xctest
+*.dylib
+
+# ── SwiftPM / Xcode 本机状态 ──
+.swiftpm/
+Packages/
+xcuserdata/
+*.xcuserstate
+*.xcuserdatad
+*.xcworkspace/xcshareddata/
+
+# ── xcodegen 生成物（真正的源是 Apps/MijiaMac/project.yml）──
+Apps/MijiaMac/*.xcodeproj/
+
+# ── 编辑器 / 系统 / IDE 工作数据（含对话记录，不入库）──
+.DS_Store
+.codebuddy/
+.vscode/
+.idea/
+*.swp
+
+# ── 凭据与本机数据（红线）──
+# 真实的 auth / 设置位于 ~/.config/mijia-mac 与
+# ~/Library/Application Support/mijia-mac，本就不在仓库内；
+# 这里再兜一层，防止有人把副本拷进项目目录。
+auth.json
+settings.json
+workbench.json
+*.p12
+*.mobileprovision
+.env
+.env.*
+*.key
+*.pem
